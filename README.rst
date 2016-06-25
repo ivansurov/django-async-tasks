@@ -1,59 +1,68 @@
-=====================================
+==================
 django-async-tasks
-=====================================
+==================
 
 Django application. It's a simple system to process queue task in real time.
 
 
-INSTALL
------------
+Requirements
+------------
 
-1. Install Redis on your server. 
+* python 2.7
+* Django 1.7 through Django 1.9
+* django-redis
 
-2. Install and configure django-redis.
 
-3. Install django-async-tasks
 
-4. Add "async_tasks" to your INSTALLED_APPS setting like this::
+Install
+-------
+
+1. Download it from PyPi with ``pip install django-async-tasks``
+
+2. Add "async_tasks" to your INSTALLED_APPS setting like this::
 
       INSTALLED_APPS = (
           ...
           'async_tasks',
       )
 
-5. Configure settings::
+3. Configure settings
 
-      ASYNC_TASKS_REDIS_SETTING_NAME = 'default' # Use the name you have defined for Redis in settings.CACHES
+* Set setting name that defined for Redis in ``settings.CACHES``. The default used 'default' setting name. ::
+
+      ASYNC_TASKS_REDIS_SETTING_NAME = 'default'
+
+* Setup log path and log filename. The default used for path ``os.path.join(BASE_DIR, 'logs')`` and filename ``'async-tasks.log'``. ::
+
       ASYNC_TASKS_LOG_PATH = os.path.join(BASE_DIR, 'logs') # Log path
       ASYNC_TASKS_LOG_FILENAME = 'async-tasks.log' # Log filename
 
-6. Add task to crontab::
+4. Add cron job to execute every minute::
 
-      */1 * * * * python manage.py django_async_tasks
-
-
-
-EXAMPLE
------------
-
-```python
-from async_tasks.utils import delay_task, ready_task, result_task
-
-def test(a, b):
-    return a + b
-
-def test_delay_task():
-
-    app_idn = delay_task(test, {'a': 1, 'b': 2})
-
-    status = ready_task(app_idn) # return response 'SUCCESS' or 'FAIL'
-
-    if status == 'SUCCESS':
-        print result_task(app_idn) # return result
-    else:
-        print status
+      python manage.py django_async_tasks
 
 
-if __name__ == "__main__":
-    test_delay_task()
-```
+
+Example
+-------
+
+::
+
+      from async_tasks.utils import delay_task, ready_task, result_task
+
+      def test(a, b):
+          return a + b
+
+      def test_delay_task():
+          app_idn = delay_task(test, {'a': 1, 'b': 2})
+
+          status = ready_task(app_idn) # return response 'SUCCESS' or 'FAIL'
+
+          if status == 'SUCCESS':
+              print result_task(app_idn) # return result
+          else:
+              print status
+
+
+      if __name__ == "__main__":
+          test_delay_task()
