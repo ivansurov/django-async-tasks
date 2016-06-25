@@ -22,7 +22,7 @@ if len(logger.handlers) < 1:
     logger.addHandler(ch)
 
 
-def delay_task(func, args):
+def delay_task(func, **args):
 
     func_name = func.__name__
     import_path = inspect.getmodule(func) or ''

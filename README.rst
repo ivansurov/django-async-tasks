@@ -2,7 +2,7 @@
 django-async-tasks
 ==================
 
-Django application. It's a simple system to process queue task in real time.
+It's a simple system to process queue task in real time.
 
 
 Requirements
@@ -46,7 +46,7 @@ How to use?
 -----------
 
 1. Add task to execute ``delayed_task(your_function, **params)``, return identification code
-2. Check is task ready ``ready_task(identification_code)``. Return 3 status ``'PROCESS'``, ``'SUCCESS'``, ``'FAIL'``
+2. Check is task ready ``ready_task(identification_code)``. Return statuses: ``'PROCESS'``, ``'SUCCESS'``, ``'FAIL'``
 3. Get result ``result_task(identification_code)``
 
 
@@ -61,12 +61,13 @@ Example
           return a + b
 
       def test_delay_task():
-          app_idn = delay_task(test, {'a': 1, 'b': 2})
-
-          status = ready_task(app_idn) # return response 'SUCCESS' or 'FAIL'
+          idn = delay_task(test, {'a': 1, 'b': 2})
+          status = None
+          while status not in ['SUCCESS', 'FAIL']:
+              status = ready_task(idn)
 
           if status == 'SUCCESS':
-              print result_task(app_idn) # return result
+              print result_task(idn)
           else:
               print status
 

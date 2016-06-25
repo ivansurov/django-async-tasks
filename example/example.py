@@ -5,13 +5,15 @@ def test(a, b):
     return a + b
 
 def test_delay_task():
+    idn = delay_task(test, {'a': 1, 'b': 2})
+    status = None
+    while status not in ['SUCCESS', 'FAIL']:
+        status = ready_task(idn)
 
-    app_idn = delay_task(test, {'a': 1, 'b': 2})
-    status = ready_task(app_idn) # return response 'SUCCESS' or 'FAIL'
     if status == 'SUCCESS':
-        print result_task(app_idn) # return result
+      print result_task(idn) # return result
     else:
-        print status
+      print status
 
 
 if __name__ == "__main__":
