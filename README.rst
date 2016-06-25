@@ -21,14 +21,14 @@ INSTALL
           'async_tasks',
       )
 
-5. Configure settings
-  
+5. Configure settings::
+
       ASYNC_TASKS_REDIS_SETTING_NAME = 'default' # Use the name you have defined for Redis in settings.CACHES
       ASYNC_TASKS_LOG_PATH = os.path.join(BASE_DIR, 'logs') # Log path
       ASYNC_TASKS_LOG_FILENAME = 'async-tasks.log' # Log filename
 
-6. Add task to crontab
-      
+6. Add task to crontab::
+
       */1 * * * * python manage.py django_async_tasks
 
 
