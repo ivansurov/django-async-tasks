@@ -16,7 +16,7 @@ setup(
     author='Ivan Surov',
     author_email='ivansurovv@gmail.com',
     packages=['async_tasks'],
-    install_requires=['redis', 'django-redis'],
+    install_requires=['redis', 'django-redis-cache'],
     include_package_data=True,
     long_description=read('README'),
     url='https://github.com/ivansurov/django-async-tasks',

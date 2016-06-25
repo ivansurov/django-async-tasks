@@ -2,16 +2,20 @@ import pickle, redis, uuid, hashlib
 from time import time as _time
 from time import sleep as _sleep
 from Queue import Full, Empty
-from django_redis import get_redis_connection
-from async_tasks.settings import REDIS_SETTING_NAME
+
 
 RedisQueuePool = None
+
 
 class RedisQueue:
     """ Simple Queue with Redis Backend"""
     
-    def __init__(self, maxsize=0, queue_name=None):
-        """The default connection parameters are: host='localhost', port=6379, db=0"""
+    def __init__(self, maxsize=0, queue_name=None, **redis_kwargs):
+        """Redis connection parameters are:
+        host='localhost', port=6379, db=0
+        OR
+        cache_setting_name='default'
+        """
         
         global RedisQueuePool
         
@@ -19,14 +23,37 @@ class RedisQueue:
             queue_name = uuid.uuid4().hex
         
         if RedisQueuePool is None:
-            r = get_redis_connection(REDIS_SETTING_NAME)
+            #if hasattr(redis_kwargs, 'cache_setting_name'):
+            #    try:
+            r = self.get_redis_connection(redis_kwargs.get('cache_setting_name'))
             RedisQueuePool = r.connection_pool
+            #    except NotImplementedError:
+            #        RedisQueuePool = redis.ConnectionPool(**redis_kwargs)
+            #else:
+            #    RedisQueuePool = redis.ConnectionPool(**redis_kwargs)
 
         self.__db = redis.StrictRedis(connection_pool=RedisQueuePool)
         self.key = 'rq:' + queue_name
         self.key_process = self.key + ':process'
         self.maxsize = maxsize
         self.exists_cache = None
+
+    def get_redis_connection(self, alias='default', write=True):
+
+        try:
+            from django.core.cache import caches
+        except ImportError:
+            from django.core.cache import get_cache
+        else:
+            def get_cache(alias):
+                return caches[alias]
+
+        cache = get_cache(alias)
+
+        if not hasattr(cache, "master_client"):
+            raise NotImplementedError
+
+        return cache.master_client
         
     def __serialize(self, item):
         """Serialize for item objects"""

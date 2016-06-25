@@ -5,7 +5,7 @@ def test(a, b):
     return a + b
 
 def test_delay_task():
-    idn = delay_task(test, {'a': 1, 'b': 2})
+    idn = delay_task(test, **{'a': 1, 'b': 2})
     status = None
     while status not in ['SUCCESS', 'FAIL']:
         status = ready_task(idn)

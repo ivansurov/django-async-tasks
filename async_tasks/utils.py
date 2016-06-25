@@ -2,6 +2,7 @@ from importlib import import_module
 from django.core.cache import cache
 from async_tasks.redisqueue import RedisQueue
 from async_tasks.settings import LOG_FILENAME, LOG_PATH
+from async_tasks.settings import REDIS_SETTING_NAME
 import hashlib, inspect, time, logging, logging.handlers, os
 
 
@@ -30,7 +31,9 @@ def delay_task(func, **args):
         import_path = '%s.' % import_path.__name__
 
     task_id = hashlib.sha224("%s%s%s" % (func_name, import_path, time.time())).hexdigest()
-    q = RedisQueue(0, UNIQUE_VAR_NAME)
+    q = RedisQueue(0, UNIQUE_VAR_NAME, **{
+        'cache_setting_name': REDIS_SETTING_NAME
+    })
     q.put_nowait(task_id)
     func_path = '%s%s' % (import_path, func_name)
     cache.set(task_id, {
@@ -61,7 +64,9 @@ def result_task(id):
 
 
 def consume_task_queue():
-    q = RedisQueue(0, UNIQUE_VAR_NAME)
+    q = RedisQueue(0, UNIQUE_VAR_NAME, **{
+        'cache_setting_name': REDIS_SETTING_NAME
+    })
     try:
         id_task = q.get_nowait()
     except:
@@ -86,18 +91,20 @@ def run_task(id_task):
     if task is None or task.get('func') is None:
         return None
 
-    result = None
     try:
         f = str_import(task.get('func'))
         result = f(**task.get('args'))
+        cache.set(id_task, {
+            'status': 'SUCCESS',
+            'result': result
+        }, 600)
         logger.info('Task id %s completed successfully' % id_task)
     except:
+        cache.set(id_task, {
+            'status': 'FAIL',
+            'result': None
+        }, 600)
         logger.critical('Task id %s ERROR!' % id_task, exc_info=True)
-
-    cache.set(id_task, {
-        'status': 'SUCCESS',
-        'result': result
-    }, 600)
 
     return True
 

@@ -9,8 +9,8 @@ Requirements
 ------------
 
 * python 2.7
-* Django 1.7 through Django 1.9
-* django-redis
+* Django 1.6 through Django 1.9
+* django-redis-cache
 
 
 
@@ -61,7 +61,7 @@ Example
           return a + b
 
       def test_delay_task():
-          idn = delay_task(test, {'a': 1, 'b': 2})
+          idn = delay_task(test, **{'a': 1, 'b': 2})
           status = None
           while status not in ['SUCCESS', 'FAIL']:
               status = ready_task(idn)
