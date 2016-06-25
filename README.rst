@@ -42,11 +42,18 @@ Install
       python manage.py django_async_tasks
 
 
+How to use?
+-----------
+
+1. Add task to execute ``delayed_task(your_function, **params)``, return identification code
+2. Check is task ready ``ready_task(identification_code)``. Return 3 status ``'PROCESS'``, ``'SUCCESS'``, ``'FAIL'``
+3. Get result ``result_task(identification_code)``
+
 
 Example
 -------
 
-::
+.. code:: python
 
       from async_tasks.utils import delay_task, ready_task, result_task
 

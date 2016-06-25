@@ -47,7 +47,7 @@ def delay_task(func, args):
 
 def ready_task(id):
     """
-    response: SUCCESS, FAIL
+    response: PROCESS, SUCCESS, FAIL
     """
     status = (cache.get(id) or {}).get('status')
     if status is None:
