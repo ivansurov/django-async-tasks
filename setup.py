@@ -16,6 +16,13 @@ setup(
     author='Ivan Surov',
     author_email='ivansurovv@gmail.com',
     packages=['async_tasks'],
+    package_data={'async_tasks':
+        [
+            '*.py',
+            'management/*',
+            'management/commands/*',
+        ]
+    },
     install_requires=['redis', 'django-redis-cache'],
     include_package_data=True,
     long_description=read('README'),
